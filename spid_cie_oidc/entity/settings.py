@@ -56,7 +56,7 @@ HTTPC_PARAMS = getattr(
     settings,
     "HTTPC_PARAMS",
     {
-        "connection": {"ssl": False}, #TODO Rimuove, solo per test
+        "connection": {"ssl": True},
         "session": {"timeout": aiohttp.ClientTimeout(total=HTTPC_TIMEOUT)},
     },
 )

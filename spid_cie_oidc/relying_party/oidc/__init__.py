@@ -31,7 +31,7 @@ class OidcUserInfo(object):
         authz_userinfo = requests.get(
             provider_conf["userinfo_endpoint"],
             headers=headers,
-            verify=verify,
+            verify= False, #verify, #TODO Rimuovere
             timeout=getattr(
                 settings, "HTTPC_TIMEOUT", 8
             ) # nosec - B113

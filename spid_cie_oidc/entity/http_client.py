@@ -31,7 +31,7 @@ async def http_get(urls, httpc_params: dict = {}):
 
 if __name__ == "__main__": # pragma: no cover
     httpc_params = {
-        "connection": {"ssl": False}, #TODO Rimuove, solo per test
+        "connection": {"ssl": True},
         "session": {"timeout": aiohttp.ClientTimeout(total=4)},
     }
     urls = [

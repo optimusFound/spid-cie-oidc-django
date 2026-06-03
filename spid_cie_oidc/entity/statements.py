@@ -38,7 +38,7 @@ def get_http_url(urls: list, httpc_params: dict = {}) -> list:
     if getattr(settings, "HTTP_CLIENT_SYNC", False):
         responses = []
         for i in urls:
-            res = requests.get(i, **httpc_params) # nosec - B113
+            res = requests.get(i, **httpc_params, verify=False) # nosec - B113 #TODO Rimuovere
             responses.append(res.content.decode())
     else:
         responses = asyncio.run(http_get(urls, httpc_params)) # pragma: no cover
