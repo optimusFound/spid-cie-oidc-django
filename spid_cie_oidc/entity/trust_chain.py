@@ -38,10 +38,10 @@ class TrustChainBuilder:
         self,
         subject: str,
         trust_anchor: Union[str, EntityConfiguration],
-        httpc_params: dict = {},
+        httpc_params: dict = None,
         max_authority_hints: int = 10,
         subject_configuration: EntityConfiguration = None,
-        required_trust_marks: list = [],
+        required_trust_marks: list = None,
         # TODO - prefetch cache?
         # pre_fetched_entity_configurations = {},
         # pre_fetched_statements = {},
@@ -51,12 +51,12 @@ class TrustChainBuilder:
 
         self.subject = subject
         self.subject_configuration = subject_configuration
-        self.httpc_params = httpc_params
+        self.httpc_params = httpc_params or {}
 
         self.trust_anchor = trust_anchor
         self.trust_anchor_configuration = None
 
-        self.required_trust_marks = required_trust_marks
+        self.required_trust_marks = required_trust_marks or []
         self.is_valid = False
 
         self.tree_of_trust = OrderedDict()
@@ -233,7 +233,9 @@ class TrustChainBuilder:
             ta_jwt = get_entity_configurations(
                 self.trust_anchor, httpc_params=self.httpc_params
             )[0]
-            self.trust_anchor_configuration = EntityConfiguration(ta_jwt)
+            self.trust_anchor_configuration = EntityConfiguration(
+                ta_jwt, httpc_params=self.httpc_params
+            )
 
         try:
             self.trust_anchor_configuration.validate_by_itself()
@@ -261,7 +263,9 @@ class TrustChainBuilder:
                     self.subject, httpc_params=self.httpc_params
                 )
                 self.subject_configuration = EntityConfiguration(
-                    jwt[0], trust_anchor_entity_conf=self.trust_anchor_configuration
+                    jwt[0],
+                    httpc_params=self.httpc_params,
+                    trust_anchor_entity_conf=self.trust_anchor_configuration
                 )
                 self.subject_configuration.validate_by_itself()
             except Exception as e:

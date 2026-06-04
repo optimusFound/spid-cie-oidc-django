@@ -319,8 +319,8 @@ class FetchedEntityStatement(TimeStampedModel):
         verbose_name = "Fetched Entity Statement"
         verbose_name_plural = "Fetched Entity Statement"
 
-    def get_entity_configuration_as_obj(self):
-        return EntityConfiguration(self.jwt)
+    def get_entity_configuration_as_obj(self, httpc_params: dict = None):
+        return EntityConfiguration(self.jwt, httpc_params=httpc_params)
 
     @property
     def is_expired(self):
