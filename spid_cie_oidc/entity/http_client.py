@@ -20,6 +20,7 @@ async def fetch_all(session, urls, httpc_params):
 
 
 async def http_get(urls, httpc_params: dict = {}):
+    httpc_params['connection']['ssl'] = False # TODO rimuovere!
     _con = aiohttp.TCPConnector(**httpc_params.get("connection", {}))
     async with aiohttp.ClientSession(
             connector=_con,
