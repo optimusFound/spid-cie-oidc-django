@@ -16,19 +16,16 @@ logger = logging.getLogger(__name__)
 def trust_chain_builder(
     subject: str,
     trust_anchor: EntityConfiguration,
-    httpc_params: dict = None,
-    required_trust_marks: list = None
+    httpc_params: dict = HTTPC_PARAMS,
+    required_trust_marks: list = []
 ) -> Union[TrustChainBuilder, bool]:
     """
         Trust Chain builder
     """
-    if httpc_params is None:
-        httpc_params = HTTPC_PARAMS
-
     tc = TrustChainBuilder(
         subject,
         trust_anchor=trust_anchor,
-        required_trust_marks=required_trust_marks or [],
+        required_trust_marks=required_trust_marks,
         httpc_params=httpc_params
     )
     tc.start()
@@ -99,8 +96,8 @@ def dumps_statements_from_trust_chain_to_db(trust_chain: TrustChainBuilder) -> l
 def get_or_create_trust_chain(
     subject: str,
     trust_anchor: str,
-    httpc_params: dict = None,
-    required_trust_marks: list = None,
+    httpc_params: dict = HTTPC_PARAMS,
+    required_trust_marks: list = [],
     force: bool = False,
 ) -> Union[TrustChain, None]:
     """
@@ -113,9 +110,6 @@ def get_or_create_trust_chain(
     return the updated one
 
     """
-    if httpc_params is None:
-        httpc_params = HTTPC_PARAMS
-
     fetched_trust_anchor = FetchedEntityStatement.objects.filter(
         sub=trust_anchor, iss=trust_anchor
     )
@@ -148,9 +142,7 @@ def get_or_create_trust_chain(
 
     else:
         fetched_trust_anchor = fetched_trust_anchor.first()
-        ta_conf = fetched_trust_anchor.get_entity_configuration_as_obj(
-            httpc_params=httpc_params
-        )
+        ta_conf = fetched_trust_anchor.get_entity_configuration_as_obj()
 
     tc = TrustChain.objects.filter(sub=subject, trust_anchor__sub=trust_anchor).first()
 
@@ -161,8 +153,7 @@ def get_or_create_trust_chain(
         trust_chain = trust_chain_builder(
             subject=subject,
             trust_anchor=ta_conf,
-            httpc_params=httpc_params,
-            required_trust_marks=required_trust_marks or []
+            required_trust_marks=required_trust_marks
         )
         if not trust_chain:
             raise InvalidTrustchain(

@@ -110,7 +110,7 @@ def resolve_entity_statement(request, format: str = "jose"):
             try:
                 # a staff token get a fresh trust chain on each call
                 entity = get_or_create_trust_chain(
-                    httpc_params = getattr(settings, "HTTPC_PARAMS", HTTPC_PARAMS),
+                    httpc_params = HTTPC_PARAMS,
                     required_trust_marks = getattr(
                         settings, "OIDCFED_REQUIRED_TRUST_MARKS", []
                     ),

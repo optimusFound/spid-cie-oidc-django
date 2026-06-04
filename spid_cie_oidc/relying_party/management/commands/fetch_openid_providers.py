@@ -48,7 +48,7 @@ class Command(BaseCommand):
                     tc = get_or_create_trust_chain(
                         subject=op_sub,
                         trust_anchor=ta,
-                        httpc_params=getattr(settings, "HTTPC_PARAMS", HTTPC_PARAMS),
+                        httpc_params=HTTPC_PARAMS,
                         required_trust_marks=getattr(
                             settings, "OIDCFED_REQUIRED_TRUST_MARKS", []
                         ),

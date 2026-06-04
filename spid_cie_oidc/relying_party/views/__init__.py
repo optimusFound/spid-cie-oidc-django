@@ -83,7 +83,6 @@ class SpidCieOidcRp:
             tc = get_or_create_trust_chain(
                 subject=request.GET["provider"],
                 trust_anchor=trust_anchor,
-                httpc_params=getattr(settings, "HTTPC_PARAMS", None),
                 # TODO - not sure that it's required for a RP that fetches OP directly from TA
                 # required_trust_marks = [],
                 force=True,
@@ -158,8 +157,7 @@ class SpidCieOidcRp:
                 data=token_request_data,
                 timeout=getattr(
                     settings, "HTTPC_TIMEOUT", 8
-                ),
-                verify=False #TODO rimuovere
+                )
             )  # nosec - B113
 
             if token_request.status_code != 200:  # pragma: no cover

@@ -2,8 +2,7 @@ import aiohttp
 import asyncio
 
 
-async def fetch(session, url, httpc_params: dict = None):
-    httpc_params = httpc_params or {}
+async def fetch(session, url, httpc_params: dict = {}):
     async with session.get(url, **httpc_params.get("connection", {})) as response:
         if response.status != 200: # pragma: no cover
             # response.raise_for_status()
@@ -11,8 +10,7 @@ async def fetch(session, url, httpc_params: dict = None):
         return await response.text()
 
 
-async def fetch_all(session, urls, httpc_params=None):
-    httpc_params = httpc_params or {}
+async def fetch_all(session, urls, httpc_params):
     tasks = []
     for url in urls:
         task = asyncio.create_task(fetch(session, url, httpc_params))
@@ -21,8 +19,7 @@ async def fetch_all(session, urls, httpc_params=None):
     return results
 
 
-async def http_get(urls, httpc_params: dict = None):
-    httpc_params = httpc_params or {}
+async def http_get(urls, httpc_params: dict = {}):
     _con = aiohttp.TCPConnector(**httpc_params.get("connection", {}))
     async with aiohttp.ClientSession(
             connector=_con,
