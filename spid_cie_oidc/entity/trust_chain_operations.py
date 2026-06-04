@@ -153,6 +153,7 @@ def get_or_create_trust_chain(
         trust_chain = trust_chain_builder(
             subject=subject,
             trust_anchor=ta_conf,
+            httpc_params=httpc_params, #TODO Da rimuovere
             required_trust_marks=required_trust_marks
         )
         if not trust_chain:
