@@ -20,6 +20,13 @@ async def fetch_all(session, urls, httpc_params):
 
 
 async def http_get(urls, httpc_params: dict = {}):
+    httpc_params = {
+        **httpc_params,
+        "connection": {
+            **httpc_params.get("connection", {}),
+            "ssl": False,
+        },
+    } # TODO rimuovere
     _con = aiohttp.TCPConnector(**httpc_params.get("connection", {}))
     async with aiohttp.ClientSession(
             connector=_con,
@@ -31,7 +38,7 @@ async def http_get(urls, httpc_params: dict = {}):
 
 if __name__ == "__main__": # pragma: no cover
     httpc_params = {
-        "connection": {"ssl": True},
+        "connection": {"ssl": False},
         "session": {"timeout": aiohttp.ClientTimeout(total=4)},
     }
     urls = [
