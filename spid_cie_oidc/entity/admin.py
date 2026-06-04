@@ -157,7 +157,7 @@ class TrustChainAdmin(admin.ModelAdmin):
                 get_or_create_trust_chain(
                     subject=sub,
                     trust_anchor=ta,
-                    httpc_params=settings.HTTPC_PARAMS,
+                    httpc_params=getattr(settings, "HTTPC_PARAMS", HTTPC_PARAMS),
                     required_trust_marks=getattr(
                         settings, "OIDCFED_REQUIRED_TRUST_MARKS", [],
                     ),

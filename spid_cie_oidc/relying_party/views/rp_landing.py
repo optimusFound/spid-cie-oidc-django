@@ -29,7 +29,8 @@ def oidc_rp_landing(request):
         try:
             tc = get_or_create_trust_chain(
                 subject = sub,
-                trust_anchor = providers[sub]["sub"]
+                trust_anchor = providers[sub]["sub"],
+                httpc_params=getattr(settings, "HTTPC_PARAMS", None),
             )
             tcs.append(tc)
         except Exception as e:
