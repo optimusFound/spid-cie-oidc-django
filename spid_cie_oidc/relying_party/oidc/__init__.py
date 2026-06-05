@@ -36,7 +36,10 @@ class OidcUserInfo(object):
                 settings, "HTTPC_TIMEOUT", 8
             ) # nosec - B113
         )
-
+        print("AUTHZ_USERINFO STATUS:", authz_userinfo.status_code)
+        print("AUTHZ_USERINFO BODY:", authz_userinfo.text)
+        print("AUTHZ_USERINFO HEADERS:", dict(authz_userinfo.headers))
+        print("ACCESS TOKEN SENT:", access_token)
         if authz_userinfo.status_code != 200: # pragma: no cover
             logger.error(
                 f"Something went wrong with {state}: {authz_userinfo.status_code}"
