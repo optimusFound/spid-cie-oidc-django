@@ -15,20 +15,21 @@ from django.contrib.auth.decorators import login_required
 _PREF = "oidc/rp"
 
 urlpatterns = []
-urlpatterns += (
-    path(
-        f"{_PREF}/authorization",
-        SpidCieOidcRpBeginView.as_view(),
-        name="spid_cie_rp_begin",
-    ),
-)
-urlpatterns += (
-    path(
-        f"{_PREF}/callback",
-        SpidCieOidcRpCallbackView.as_view(),
-        name="spid_cie_rp_callback",
-    ),
-)
+# urlpatterns += (
+#     path(
+#         f"{_PREF}/authorization",
+#         SpidCieOidcRpBeginView.as_view(),
+#         name="spid_cie_rp_begin",
+#     ),
+# )
+# urlpatterns += (
+#     path(
+#         f"{_PREF}/callback",
+#         SpidCieOidcRpCallbackView.as_view(),
+#         name="spid_cie_rp_callback",
+#     ),
+# )
+#TODO presenti versioni custom
 urlpatterns += (
     path(
         f"{_PREF}/echo_attributes",
