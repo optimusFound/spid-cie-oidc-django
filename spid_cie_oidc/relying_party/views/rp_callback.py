@@ -260,7 +260,6 @@ class SpidCieOidcRpCallbackView(View, SpidCieOidcRp, OidcUserInfo, OAuth2Authori
             authz.state,
             authz_token.access_token,
             authz.provider_configuration,
-            verify=False # TODO rimuovere
         )
         if not userinfo:
             logger.warning(

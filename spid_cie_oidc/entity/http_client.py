@@ -21,15 +21,6 @@ async def fetch_all(session, urls, httpc_params):
 
 
 async def http_get(urls, httpc_params: dict = {}):
-    print("PRE httpc_params", httpc_params)
-    httpc_params = {
-        **httpc_params,
-        "connection": {
-            **httpc_params.get("connection", {}),
-            "ssl": False,
-        },
-    } # TODO rimuovere
-    print("POST httpc_params", httpc_params)
     _con = aiohttp.TCPConnector(**httpc_params.get("connection", {}))
     async with aiohttp.ClientSession(
             connector=_con,

@@ -57,7 +57,6 @@ class OAuth2AuthorizationCodeGrant(object):
         token_request = requests.post(
             token_endpoint_url,
             data=grant_data,
-            verify=False, # TODO rimuovere
             timeout=HTTPC_TIMEOUT,
         )
 

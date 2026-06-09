@@ -158,7 +158,6 @@ class SpidCieOidcRp:
                 timeout=getattr(
                     settings, "HTTPC_TIMEOUT", 8
                 ),
-                verify=False # TODO rimuovere
             )  # nosec - B113
 
             if token_request.status_code != 200:  # pragma: no cover
