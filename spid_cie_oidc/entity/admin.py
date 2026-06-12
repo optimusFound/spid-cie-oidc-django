@@ -21,7 +21,7 @@ from spid_cie_oidc.entity.trust_chain_operations import get_or_create_trust_chai
 from . settings import HTTPC_PARAMS
 
 logger = logging.getLogger(__name__)
-from urllib.parse import urlencode
+
 
 @admin.register(FederationHistoricalKey)
 class FederationHistoricalKey(admin.ModelAdmin):
@@ -41,78 +41,75 @@ class FederationEntityConfigurationAdmin(admin.ModelAdmin):
     # }
     # }
 
-    @admin.action(description="update trust marks")
+    @admin.action(description='update trust marks')
     def update_trust_marks(modeladmin, request, queryset):  # pragma: no cover
         """
-        Fetch trust marks from all configured authorities.
+        fetch trust marks from all the authorities
         """
+        trust_marks = {}
 
         for obj in queryset:
-            trust_marks = {}
-
             jwts = get_entity_configurations(obj.authority_hints, HTTPC_PARAMS)
-
             for jwt in jwts:
+
                 try:
                     ec = EntityConfiguration(jwt, httpc_params=HTTPC_PARAMS)
-                except Exception as exc:
-                    msg = f"Failed getting Entity Configuration for {jwt}: {exc}"
-                    logger.exception(msg)
-                    modeladmin.message_user(request, msg, level=messages.ERROR)
+                except Exception as e:
+                    _msg = f"Failed getting Entity Configuration for {jwt}: {e}"
+                    logger.warning(_msg)
+                    messages.error(_msg)
                     continue
 
                 try:
+                    # get superior fetch url
                     fetch_api_url = ec.payload["metadata"]["federation_entity"][
                         "federation_fetch_endpoint"
                     ]
                 except KeyError:
-                    msg = (
-                        "Missing federation_fetch_endpoint in federation_entity "
-                        f"metadata for {obj.sub} by {ec.sub}."
+                    _msg = (
+                        "Missing federation_fetch_endpoint in  "
+                        f"federation_entity metadata for {obj.sub} by {ec.sub}."
                     )
-                    logger.warning(msg)
-                    modeladmin.message_user(request, msg, level=messages.ERROR)
+                    logger.warning(_msg)
+                    messages.error(_msg)
                     continue
 
-                url = f"{fetch_api_url}?{urlencode({'sub': obj.sub})}"
-
+                _url = f"{fetch_api_url}?sub={obj.sub}"
                 try:
-                    logger.info("Getting entity statements from %s", url)
-                    entity_statement_jwts = get_entity_statements([url], HTTPC_PARAMS)
+                    logger.info(f"Getting entity statements from {_url}")
+                    _jwts = get_entity_statements([_url], HTTPC_PARAMS)
 
-                    if not entity_statement_jwts:
-                        msg = f"No entity statements returned from {url}"
-                        logger.warning(msg)
-                        modeladmin.message_user(request, msg, level=messages.ERROR)
-                        continue
-
-                    payload = unpad_jwt_payload(entity_statement_jwts[0])
-
-                    for trust_mark in payload.get("trust_marks", []):
-                        if not isinstance(trust_mark, dict):
-                            logger.warning("Invalid trust mark item: %r", trust_mark)
-                            continue
-
-                        trust_mark_id = trust_mark.get("id")
-                        trust_mark_jwt = trust_mark.get("trust_mark")
-
-                        if not trust_mark_id or not trust_mark_jwt:
-                            logger.warning("Incomplete trust mark item: %r", trust_mark)
-                            continue
-
-                        trust_marks[trust_mark_id] = trust_mark_jwt
-
-                except Exception as exc:
-                    msg = f"Error getting entity statements from {url}: {exc}"
-                    logger.exception(msg)
-                    modeladmin.message_user(request, msg, level=messages.ERROR)
+                    payload = unpad_jwt_payload(_jwts[0])
+                    for i in payload.get("trust_marks", []):
+                        trust_marks[i['id']] = i['trust_mark']
+                except Exception as e:
+                    _msg = f"Error getting entity statements from {_url}: {e}"
+                    logger.warning(_msg)
+                    messages.error(_msg)
                     continue
 
-            obj.trust_marks = trust_marks
-            obj.save(update_fields=["trust_marks"])
+            positions = {}
+            count = 0
+            for i in obj.trust_marks:
+                positions[i['id']] = count
+                count += 1
 
-            msg = f"Updated {len(trust_marks)} trust mark(s) for {obj.sub}"
-            modeladmin.message_user(request, msg, level=messages.SUCCESS)
+            if positions:
+                for k,v in trust_marks.items():
+                    if positions.get(k, None):
+                        obj.trust_marks[positions[k]] = {k:v}
+                    else:
+                        obj.trust_marks.append({k:v})
+            else:
+                obj.trust_marks = [
+                    {"trust_mark_id":k, "trust_mark":v} for k,v in trust_marks.items()
+                ]
+
+            obj.save()
+            messages.success(
+                request,
+                f"Trust mark reloaded succesfully: {', '.join(trust_marks.keys())}"
+            )
 
     list_display = (
         "sub",
