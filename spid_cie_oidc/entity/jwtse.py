@@ -24,10 +24,13 @@ logger = logging.getLogger(__name__)
 
 
 def unpad_jwt_element(jwt: str, position: int) -> dict:
-    b = jwt.split(".")[position]
-    padded = f"{b}{'=' * divmod(len(b), 4)[1]}"
-    data = json.loads(base64.urlsafe_b64decode(padded))
-    return data
+    parts = jwt.split(".")
+    if len(parts) <= position:
+        raise ValueError(f"JWT non valido: manca la parte {position}")
+    value = parts[position]
+    padded = value + "=" * (-len(value) % 4)
+    decoded = base64.urlsafe_b64decode(padded.encode("ascii"))
+    return json.loads(decoded.decode("utf-8"))
 
 
 def unpad_jwt_head(jwt: str) -> dict:
